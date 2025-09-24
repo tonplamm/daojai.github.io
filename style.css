@@ -1,0 +1,163 @@
+body {
+    background-color: #17191d;
+    font-family: "Noto Sans Thai", sans-serif;
+    color: white;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 380px;
+}
+
+.name {
+    font-size: 50px;
+
+    width: 200px;
+
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+.score {
+    font-size: 30px;
+
+    margin-top: -20px;
+}
+
+.changemode {
+    background-color: #444444;
+    border-radius: 10px;
+    font-weight: bold;
+
+    width: 100px;
+    height: 40px;
+
+    margin-top: 30px;
+    margin-right: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.midheader {
+    background-color: none;
+
+    width: 380px;
+    height: 50px;
+
+    position: relative;
+    margin-top: 10vh;
+}
+
+.qleft {
+    font-size: 25px;
+    background-color: none;
+
+    width: auto;
+    height: auto;
+
+    position: absolute;
+    left: 3px;
+    bottom: 0px;
+}
+
+.qright {
+    font-size: 25px;
+    background-color: none;
+
+    width: auto;
+    height: auto;
+
+    position: absolute;
+    right: 3px;
+    bottom: 0px;
+}
+
+.box {
+    background-color: #1c2b4a;
+    border-radius: 15px;
+    border: 5px solid white;
+
+    width: 360px;
+    height: 175px;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.bars-group {
+    position: absolute;   /* we’ll move it with left: px */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 200px;          /* tweak as you like */
+    display: flex;
+    gap: 0;               /* no gap between bars */
+    transition: left 260ms ease, opacity 160ms ease;
+}
+
+.bars-group.hidden { opacity: 0; }
+
+.bar { width: 20px; height: 100%; }
+
+/* colors like your mock (red/orange/cyan/orange/red) */
+.bar:nth-child(1), .bar:nth-child(5) { background: #ff6b6b; }
+.bar:nth-child(2), .bar:nth-child(4) { background: #ffa559; }
+.bar:nth-child(3) { background: #58d6f7; }
+
+.slider-container {
+    background-color: none;
+
+    width: 370px;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;  
+    background: #6c6c6c;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 30px;
+height: 30px;
+border-radius: 50%; 
+background: white;
+cursor: pointer;
+top: 5px;
+}
+
+.slider::-moz-range-thumb {
+width: 5px;
+height: 5px;
+border-radius: 50%;
+cursor: pointer;
+}
+
+.button {
+    background-color: #444444;
+    border-radius: 10px;
+    font-weight: bold;
+
+    width: 100px;
+    height: 40px;
+
+    margin-top: 2vh;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

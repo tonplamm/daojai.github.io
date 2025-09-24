@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="header">
+        <h1 class="name">
+            เกมเดาใจ
+            <div class="score">score : 0</div>
+        </h1>
+        <div class="changemode">custom</div>
+    </div>
+    <div class="mid">
+        <div class="midheader">
+            <div class="qleft">นิสัยดี</div>
+            <div class="qright">นิสัยไม่ดี</div>
+        </div>
+        <div class="box" id="box">
+        <div class="bars-group" id="group">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        </div>
+        <div class="slider-container">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+        <div class="button" id="btn-pos">random</div>
+    </div>
+</body>
+
+<script>
+  // ---------- CONFIG: edit questions here ----------
+const QUESTIONS = [
+  { left: 'นิสัยไม่ดี', right: 'นิสัยดี' },
+  { left: 'จน', right: 'รวย' },
+  { left: 'อินโทรเวิร์ต', right: 'เอ็กซ์โทรเวิร์ต' },
+  { left: 'ทีมหมา', right: 'ทีมแมว' },
+
+  { left: 'เผ็ดน้อย', right: 'เผ็ดมาก' },
+  { left: 'ประหยัด', right: 'ฟุ่มเฟือย' },
+  { left: 'จริงจัง', right: 'ชิล' },
+  { left: 'เมือง', right: 'ธรรมชาติ' },
+  { left: 'ตื่นเช้า', right: 'นอนดึก' },
+  { left: 'เงียบ', right: 'เสียงดัง' },
+  { left: 'เร็ว', right: 'ช้า' },
+  { left: 'คลาสสิก', right: 'ทันสมัย' },
+  { left: 'เสี่ยง', right: 'ปลอดภัย' },
+  { left: 'จืด', right: 'จัดจ้าน' },
+  { left: 'อยู่บ้าน', right: 'ออกไปข้างนอก' },
+  { left: 'พึ่งโชค', right: 'พึ่งฝีมือ' },
+  { left: 'ทำคนเดียว', right: 'ทำเป็นทีม' },
+  { left: 'เคร่งกฎ', right: 'ยืดหยุ่น' },
+  { left: 'เหตุผล', right: 'ความรู้สึก' },
+  { left: 'ของเก่า', right: 'ของใหม่' },
+  { left: 'โลเทค', right: 'ไฮเทค' },
+  { left: 'หวานน้อย', right: 'หวานมาก' },
+  { left: 'ทะเล', right: 'ภูเขา' },
+  { left: 'สั้นกระชับ', right: 'ยาวละเอียด' }
+];
+  // -------------------------------------------------
+
+  // Elements from your existing markup
+  const box    = document.getElementById('box');
+  const group  = document.getElementById('group');
+  const btn    = document.getElementById('btn-pos');
+  const slider = document.getElementById('myRange');
+  const qLeft  = document.querySelector('.qleft');
+  const qRight = document.querySelector('.qright');
+  const scoreEl= document.querySelector('.score');
+
+    const modeBtn = document.querySelector('.changemode');
+    let customMode = false;
+
+    // click "custom" → set qleft/qright (no UI added)
+    modeBtn.addEventListener('click', () => {
+    const left = prompt('qleft:', qLeft.textContent);
+    if (left === null) return; // cancelled
+    const right = prompt('qright:', qRight.textContent);
+    if (right === null) return; // cancelled
+
+    const newLeft  = left.trim();
+    const newRight = right.trim();
+    if (newLeft)  qLeft.textContent  = newLeft;
+    if (newRight) qRight.textContent = newRight;
+
+    customMode = true; // lock words; no more random questions
+    });
+
+
+  // Score
+  let totalScore = 0;
+  const updateScoreLabel = () => (scoreEl.textContent = 'score : ' + totalScore);
+
+  // Bars show/hide
+  const showGroup = () => group.classList.remove('hidden');
+  const hideGroup = () => group.classList.add('hidden');
+
+  // Geometry helpers
+  const groupWidthPx = () => group.getBoundingClientRect().width;
+
+  function randomizePosition() {
+    const boxW = box.clientWidth;
+    const gW   = groupWidthPx();
+    const maxLeft = Math.max(0, boxW - gW);
+    group.style.left = Math.floor(Math.random() * (maxLeft + 1)) + 'px';
+  }
+
+  let lastQIndex = -1;
+
+    function pickRandomQuestion() {
+    if (QUESTIONS.length === 0) return;
+
+    let idx;
+    if (QUESTIONS.length === 1) {
+        idx = 0; // only one choice, allow repeat
+    } else {
+        do {
+        idx = Math.floor(Math.random() * QUESTIONS.length);
+        } while (idx === lastQIndex);
+    }
+
+    const q = QUESTIONS[idx];
+    qLeft.textContent = q.left;
+    qRight.textContent = q.right;
+    lastQIndex = idx;
+    }
+
+  // Compute points based on slider vs. bars
+  function computeScore() {
+    const boxRect   = box.getBoundingClientRect();
+    const groupRect = group.getBoundingClientRect();
+
+    // slider x inside the box (0..box.width)
+    const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
+    const ratio = (val - min) / (max - min);
+    const sliderX = ratio * boxRect.width;
+
+    // bar group range inside the box
+    const gLeft  = groupRect.left - boxRect.left;
+    const gRight = groupRect.right - boxRect.left;
+
+    if (sliderX < gLeft || sliderX > gRight) return 0; // outside the group -> 0
+
+    const rel = (sliderX - gLeft) / (gRight - gLeft);      // 0..1 within the group
+    let idx = Math.floor(rel * 5);                         // 0..4 which bar
+    if (idx === 5) idx = 4;
+
+    const scoreMap = [1, 2, 3, 2, 1];                      // outer→center
+    return scoreMap[idx];
+  }
+
+  // Simple loop: random -> hide -> show -> random
+  const State = { Idle: 'idle', Ready: 'ready', Hidden: 'hidden' };
+  let state = State.Idle;
+
+  function setState(next) {
+    state = next;
+    if (state === State.Idle)    { btn.textContent = 'random'; showGroup(); }
+    if (state === State.Ready)   { btn.textContent = 'hide';   showGroup(); }
+    if (state === State.Hidden)  { btn.textContent = 'show';   hideGroup(); }
+  }
+
+btn.addEventListener('click', () => {
+  if (state === State.Idle) {
+    if (!customMode) pickRandomQuestion(); // only randomize words if NOT in custom mode
+    randomizePosition();                    // bars still random
+    setState(State.Ready);
+  } else if (state === State.Ready) {
+    setState(State.Hidden);
+  } else {
+    showGroup();
+    const gained = computeScore();
+    totalScore += gained;
+    updateScoreLabel();
+    setState(State.Idle);
+  }
+});
+
+
+  // Initial layout
+  window.addEventListener('load', () => {
+    // center once
+    const boxW = box.clientWidth, gW = groupWidthPx();
+    group.style.left = Math.max(0, (boxW - gW) / 2) + 'px';
+    updateScoreLabel();
+    setState(State.Idle);
+  });
+
+  // Keep group inside on resize
+  window.addEventListener('resize', () => {
+    const boxW = box.clientWidth, gW = groupWidthPx();
+    const left = parseFloat(getComputedStyle(group).left) || 0;
+    const clamped = Math.min(Math.max(0, left), Math.max(0, boxW - gW));
+    group.style.left = clamped + 'px';
+  });
+</script>
+
+
+</html>
