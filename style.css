@@ -22,7 +22,7 @@ body {
 .score {
     font-size: 30px;
 
-    margin-top: -20px;
+    margin-top: -10px;
 }
 
 .changemode {
@@ -161,3 +161,69 @@ cursor: pointer;
     align-items: center;
     justify-content: center;
 }
+
+/* --- Responsive additions --- */
+:root{
+  --page-max: 720px;   /* how wide it can grow on desktop */
+  --page-pad: 16px;    /* side padding on small screens */
+}
+
+/* Make core sections fluid with a max width */
+.header,
+.midheader,
+.box,
+.slider-container {
+  width: min(100vw - (var(--page-pad) * 2), var(--page-max));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Remove hard locks that were mobile-only */
+.header { max-width: var(--page-max); }
+.midheader { max-width: var(--page-max); height: 50px; }
+.box {
+  /* grow with screen while keeping a nice proportion */
+  max-width: var(--page-max);
+  width: min(100vw - (var(--page-pad) * 2), var(--page-max));
+  /* prefer aspect ratio over fixed height so it scales */
+  aspect-ratio: 16 / 7;             /* tweak if you want it taller/shorter */
+  height: auto;                      /* replaces the fixed 175px */
+}
+.slider-container { max-width: var(--page-max); }
+
+/* Bars group should scale with the box height */
+.bars-group {
+  height: 100%;                       /* was 200px; now relative to .box */
+}
+
+/* Let bar width scale a bit on bigger screens */
+.bar { width: clamp(14px, 1.8vw, 24px); }
+
+/* Typography scales up on desktop but stays comfy on mobile */
+.name   { font-size: clamp(32px, 6vw, 56px); width: 20vh; }
+.score  { font-size: clamp(18px, 3vw, 28px); }
+.qleft,
+.qright { font-size: clamp(16px, 2.2vw, 26px); }
+
+/* Header layout stays flexible and centered */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 var(--page-pad);
+}
+
+/* Keep midheader texts pinned at edges with some breathing room */
+.midheader { position: relative; padding: 0 var(--page-pad); }
+.qleft  { left: var(--page-pad);  bottom: 0; }
+.qright { right: var(--page-pad); bottom: 0; }
+
+/* Slightly bigger targets on wider screens */
+@media (min-width: 1024px) {
+  .changemode, .button {
+    width: 120px; height: 44px;
+  }
+}
+
+/* Optional: give small screens comfortable side padding */
+body { margin: 0; }
